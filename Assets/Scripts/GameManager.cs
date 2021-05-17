@@ -22,13 +22,12 @@ public class GameManager : MonoBehaviour
         {
             enemiesList.Add(enemy);
         }
+
         GameObject.Find("Global Light 2D").GetComponent<Light2D>().intensity = GameObject.Find("SetDifficulty").GetComponent<DifficultyHolder>().difficulty;
     }
 
     void Update()
     {
-        Debug.Log(GameObject.Find("Global Light 2D").GetComponent<Light2D>());
-        Debug.Log( GameObject.Find("SetDifficulty").GetComponent<DifficultyHolder>());
         foreach (Enemy enemy in enemiesList)
         {
             if(enemy.GetDeath())
@@ -36,17 +35,19 @@ public class GameManager : MonoBehaviour
                 enemiesList.Remove(enemy);
             }
         }
+
         if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (pauseMenu.isPaused)
             {
-                if (pauseMenu.isPaused)
-                {
-                    pauseMenu.Resume();
-                }  else
-                {
-                    pauseMenu.Pause();
-                }
+                pauseMenu.Resume();
+            }else
+            {
+                pauseMenu.Pause();
+            }
         }
-            if(enemiesList.Count <= 0)
+        
+        if(enemiesList.Count <= 0)
         {
             if (!won)
             {

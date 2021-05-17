@@ -61,6 +61,7 @@ public class PlayerMovement : MonoBehaviour
             }
             
         }
+        
         if(Input.GetKeyUp(KeyCode.Space))
         {
             midJump = false;

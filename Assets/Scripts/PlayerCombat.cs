@@ -16,7 +16,7 @@ public class PlayerCombat : MonoBehaviour
     private bool airAttack = false;
     private bool dead = false;
 
-       void Start()
+    void Start()
     {
         currentHealth = maxHealth;
     }

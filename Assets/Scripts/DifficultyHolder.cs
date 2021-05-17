@@ -17,6 +17,7 @@ public class DifficultyHolder : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        
         DontDestroyOnLoad(gameObject);
     }
 }
