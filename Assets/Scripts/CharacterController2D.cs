@@ -3,35 +3,24 @@ using UnityEngine.Events;
 
 public class CharacterController2D : MonoBehaviour
 {
-	public float jumpForce = 400f;							// Amount of force added when the player jumps.
-	[Range(0, .3f)] public float movementSmoothing = .05f;	// How much to smooth out the movement
-	public bool airControl = false;							// Whether or not a player can steer while jumping;
-	public LayerMask whatIsGround;							// A mask determining what is ground to the character
-	public Transform groundCheck;							// A position marking where to check if the player is grounded.
+	public float jumpForce = 400f;
+	[Range(0, .3f)] public float movementSmoothing = .05f;
+	public LayerMask whatIsGround;
+	public Transform groundCheck;
 
-	const float groundedRadius = .2f; 
+	const float groundedRadius = 0.2f; 
 	public bool grounded;            
 	private Rigidbody2D rigidbody2D;
 	private bool facingRight = true;
 	private Vector3 velocity = Vector3.zero;
 
-	[Header("Events")]
-	[Space]
-
-	public UnityEvent OnLandEvent;
-
 	private void Awake()
 	{
 		rigidbody2D = GetComponent<Rigidbody2D>();
-
-		if (OnLandEvent == null)
-			OnLandEvent = new UnityEvent();
-
 	}
 
 	private void FixedUpdate()
 	{
-		bool wasGrounded = grounded;
 		grounded = false;
 
 		Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position, groundedRadius, whatIsGround);
@@ -40,8 +29,6 @@ public class CharacterController2D : MonoBehaviour
 			if (colliders[i].gameObject != gameObject)
 			{
 				grounded = true;
-				if (!wasGrounded)
-					OnLandEvent.Invoke();
 			}
 		}
 	}
@@ -49,32 +36,19 @@ public class CharacterController2D : MonoBehaviour
 
 	public void Move(float move, bool jump)
 	{
+		Vector3 targetVelocity = new Vector2(move * 10f, rigidbody2D.velocity.y);
+		rigidbody2D.velocity = Vector3.SmoothDamp(rigidbody2D.velocity, targetVelocity, ref velocity, movementSmoothing);
 
-		//only control the player if grounded or airControl is turned on
-		if (grounded || airControl)
+		if (move > 0 && !facingRight)
 		{
-			// Move the character by finding the target velocity
-			Vector3 targetVelocity = new Vector2(move * 10f, rigidbody2D.velocity.y);
-			// And then smoothing it out and applying it to the character
-			rigidbody2D.velocity = Vector3.SmoothDamp(rigidbody2D.velocity, targetVelocity, ref velocity, movementSmoothing);
-
-			// If the input is moving the player right and the player is facing left...
-			if (move > 0 && !facingRight)
-			{
-				// ... flip the player.
-				Flip();
-			}
-			// Otherwise if the input is moving the player left and the player is facing right...
-			else if (move < 0 && facingRight)
-			{
-				// ... flip the player.
-				Flip();
-			}
+			Flip();
+		}else if (move < 0 && facingRight)
+		{
+			Flip();
 		}
-		// If the player should jump...
+
 		if (grounded && jump)
 		{
-			// Add a vertical force to the player.
 			grounded = false;
 			rigidbody2D.AddForce(new Vector2(0f, jumpForce));
 		}
@@ -83,10 +57,7 @@ public class CharacterController2D : MonoBehaviour
 
 	private void Flip()
 	{
-		// Switch the way the player is labelled as facing.
 		facingRight = !facingRight;
-
-		// Multiply the player's x local scale by -1.
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
 		transform.localScale = theScale;
